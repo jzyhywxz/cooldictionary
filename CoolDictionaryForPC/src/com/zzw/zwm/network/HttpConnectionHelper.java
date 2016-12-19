@@ -72,8 +72,8 @@ public class HttpConnectionHelper {
 			}
 			// -- read content finished --
 		} catch (IOException e) {
-			System.err.println("http connection IO exception!");
-			e.printStackTrace();
+			//System.err.println("http connection IO exception!");
+			//e.printStackTrace();
 		} finally {
 			try {
 				if(reader!=null)

@@ -175,11 +175,35 @@ public class ContentReaderFactory {
 		return new SimpleContentReader(tab, seg){
 			@Override
 			public String getKeyword() {
-				return null;
+				Matcher kwmhead=Pattern.compile("<h1 class=\"keyword\">").matcher(content);
+				Matcher kwmtail=Pattern.compile("</h1>").matcher(content);
+				if((!kwmhead.find()) || (!kwmtail.find()))
+					return "";
+				int start=kwmhead.end();
+				int end=kwmtail.start();
+				return content.substring(start, end).trim();
 			}
 			@Override
 			public String getTranslation() {
-				return null;
+				// 第一层
+				Matcher trmhead=Pattern.compile("<ul[^>]*>").matcher(content);
+				Matcher trmtail=Pattern.compile("</ul>").matcher(content);
+				if((!trmhead.find()) || (!trmtail.find()))
+					return "";
+				int start=trmhead.end();
+				int end=trmtail.start();
+				String trans=content.substring(start, end).replaceAll("</?s?p[^>]*>", "");
+				// 第二层
+				StringBuilder sb=new StringBuilder();
+				trmhead=Pattern.compile("<li[^>]*>").matcher(trans);
+				trmtail=Pattern.compile("</li>").matcher(trans);
+				while(trmhead.find() && trmtail.find()){
+					sb.append(trans.substring(trmhead.end(), trmtail.start())).
+					append("\n");
+				}
+				if(sb.length()>0)
+					sb.deleteCharAt(sb.length()-1);
+				return sb.toString();
 			}
 			@Override
 			public long skip(BufferedReader reader) {
